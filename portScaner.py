@@ -2,21 +2,21 @@ import optparse
 import socket
 from socket import *
 
-def connScan(tgtHost, tgtPort):
+def connScan(tgtHost, tgtPort):  #尝试与指定目标主机建立连接
     try:
         connSkt = socket(AF_INET, SOCK_STREAM)
         connSkt.connect((tgtHost, tgtPort))
-        connSkt.send("FishPython\r\n")
-        result = connSkt.recv(100)
+        connSkt.send("FishPython\r\n") #发送垃圾数据
+        result = connSkt.recv(100) #接受目标主机发回的Banner
         print("[+]%d/tcp open" % tgtPort)
         print("[+] " + str(result))
         connSkt.close()
     except:
         print("[-]%d/tcp closed" % tgtPort)
 
-def portScan(tgtHost, tgtPorts):
+def portScan(tgtHost, tgtPorts): #基于指定主机扫描多个端口
     try:
-        tgtIP = gethostbyname(tgtHost)
+        tgtIP = gethostbyname(tgtHost) #获取主机名
         print(tgtHost)
         print(tgtIP)
     except:
@@ -29,11 +29,13 @@ def portScan(tgtHost, tgtPorts):
     except:
         print("\n[+]Scan result for:" + tgtIP)
     setdefaulttimeout(1)
-    for tgtPort in tgtPorts:
+    for tgtPort in tgtPorts: #测试各个端口是否可用
         print("scanning port " + tgtPort)
         connScan(tgtHost, int(tgtPort))
 
 def main():
+    
+    #快速解析目标主机
     parser = optparse.OptionParser("usage %prog -H <target host> -P <target port>")
     parser.add_option("-H", dest="tgtHost", type="string",\
                       help="specify target host")
@@ -46,6 +48,8 @@ def main():
         print(parser.usage)
         print("You must specify target host and port[s].")
         exit(0)
+        
+    #扫描端口
     portScan(tgtHost, tgtPorts)
 
 main()
